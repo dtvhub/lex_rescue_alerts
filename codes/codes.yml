@@ -1,0 +1,117 @@
+EMS:
+  MED: Medical
+  EASE: Active Aggressor/Active Shooter Event
+  EBERT: ALS Alarm BERT Medical
+  EASS: ALS Assault
+  EAIP: ALS Assault in Progress
+  EAST: ALS Asthma
+  EBUV: ALS Burn Victim
+  ECHP: ALS Chest Pain
+  ECHO: ALS Choking
+  ECOD: ALS Code Blue
+  ECOR: ALS Coronary
+  ECUT: ALS Cutting/Stabbing
+  EDIA: ALS Diabetic
+  EDIB: ALS Difficulty Breathing
+  EDRO: ALS Drowning
+  EELC: ALS Electrocution/Electric Shock
+  EELE: ALS Elevator Emergency
+  EEMT: ALS Emergency Transfer
+  EDET: ALS EMS Detail
+  EOTH: ALS EMS Other
+  EFAI: ALS Fainted
+  EIDP: ALS Infectious Disease Protocol
+  EIFF: ALS Injured from Fall (over 10 ft)
+  EINP: ALS Injured Person
+  ELOI: ALS Lock In/Lock Out with Medical Emergency
+  EMAT: ALS Maternity
+  EMCI: ALS MCI - Only Use for Upgrade
+  EOVD: ALS Overdose/Poisoning
+  EPSY: ALS Psychological
+  EMER: ALS Radio Emergency
+  EPD7: ALS Reaction to Medication
+  ESEI: ALS Seizure
+  ESHO: ALS Shock
+  ESHT: ALS Shooting/Gunshot Wound
+  ESIC: ALS Sick Case
+  ESOW: ALS Slumped over the Wheel
+  ESMI: ALS Smoke Inhalation
+  ESTR: ALS Stroke/CVA
+  ESUD: ALS Subject Down
+  ESUA: ALS Suicide Attempt/Threat
+  EUNC: ALS Unconscious Person
+  EUNT: ALS Unknown Trouble (EMS)
+  EURN: ALS Unresponsive Person
+  EVIS: ALS Vehicle in Structure
+  EVEA: ALS Vehicle Accident (Minor)
+  EVAM: ALS Vehicle Accident (Minor)
+  EVAJ: ALS Vehicle Accident with JAWS
+
+FIRE:
+  FAA1: Aircraft Alert 1
+  FAA2: Aircraft Alert 2
+  FAA3: Aircraft Alert 3
+  FASB: Aircraft Standby Bluegrass Station
+  FASS: Assistance
+  FBAS: Barricaded Subject
+  FBOT: Bomb Threat
+  FBWD: Bomb Threat with Device
+  FBGL: Brush/Grass/Leaf/Tree Fire
+  FBERTR: BERT - Rescue
+  FBERTH: BERT - Hazmat
+  FCMS: Carbon Monoxide Sickness
+  FCAR: Carbon Monoxide Situation
+  FCHI: Chimney Fire
+  FCOL: Collapse Rescue
+  FCSEPP: Community Emergency - Bluegrass Army Depot
+  FCSR: Confined Space Rescue
+  FDVR: Dive Rescue Response
+  FDUM: Dumpster Fire
+  FELC: Electrical Cutoff
+  FELF: Electrical Fire
+  FELS: Elevator Situation
+  FEXP: Explosion
+  FFIA: Fire in an Appliance
+  FDET: Fire Detail
+  FFHMR: Full Hazmat Response
+  FGAC: Gas Cutoff
+  FGAS: Gasoline/Full Leak
+  FHMC: Hazardous Material
+  FSCU: Hazmat - MVC General Spill Clean Up
+  FHCL: Hazmat - Clandestine Lab
+  FMERC: Hazmat - Mercury Spill
+  FHGEO: Hazmat - Natural Gas from Geothermal/Water Well
+  FINV: Investigation
+  FLAR: Large Animal Rescue
+  FLIFT: Lift Assist
+  FLOI: Lock In/Lock Out
+  FMAI: Mailbox Fire
+  FMDR: Mass DECON Response - UK Commonwealth Stadium
+  FMIS: Missing Person
+  FNGL: Natural GAS Leak (Natural GAS & Propane)
+  FGAO: Natural GAS Odor (Natural GAS or Propane)
+  FOTF: Other Fire
+  FOTS: Other Service
+  FK9R: Out of County Investigation K-9 Response
+  FPRT: Private/Telephone Alarm
+  FFLB: Reduced Response (Plan B)
+  FWAR: Remove Water
+  FROP: Rope/High Angel Rescue
+  FSIA: Smoke in the Area - Outdoors
+  FSMO: Smoke in Area/Structure/Odor
+  FSRCU: Special Rescue Related to Civil Unrest
+  FSTR: Structure Fire
+  FSTRW: Structure Fire - Working
+  FTRA: Train Accident
+  FTRN: Transformer Fire
+  FTRS: Trash Fire
+  FTRE: Trench Rescue
+  FUNT: Unknown Trouble
+  FVIS: Vehicle in Structure
+  FVAJ: Vehicle Accident with JAWS
+  FVEH: Vehicle Fire
+  FVNS: Vehicle Fire Near a Structure
+  FVLA: Vehicle Fire (Large Vehicle)
+  FWAC: Water Cutoff
+  FWTR: Water Rescue
+  FWID: Wires Down
