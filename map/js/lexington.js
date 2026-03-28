@@ -1,4 +1,27 @@
-// Fetch and parse Lexington Fire incidents
+// -------------------------------
+//  ICONS
+// -------------------------------
+const medIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34]
+});
+
+const fireIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34]
+});
+
+// Store markers so we can clear them on refresh
+let activeMarkers = [];
+
+
+// -------------------------------
+//  FETCH LEXINGTON FIRE DATA
+// -------------------------------
 async function fetchLexingtonCalls() {
   const url = "https://thingproxy.freeboard.io/fetch/https://fire.lexingtonky.gov/open/status/status.htm";
 
@@ -9,7 +32,6 @@ async function fetchLexingtonCalls() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    // Each incident is inside: <div class="data" grid>
     const incidentBlocks = [...doc.querySelectorAll("div.data")];
 
     const calls = incidentBlocks.map(block => {
@@ -34,21 +56,66 @@ async function fetchLexingtonCalls() {
   }
 }
 
-// Update the map with markers
+
+// -------------------------------
+//  GEOCODING (Nominatim)
+// -------------------------------
+async function geocodeAddress(address) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ", Lexington KY")}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.length === 0) return null;
+
+    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+
+  } catch (err) {
+    console.error("Geocoding error:", err);
+    return null;
+  }
+}
+
+
+// -------------------------------
+//  UPDATE MAP
+// -------------------------------
 async function updateMap() {
   console.log("updateMap() called");
 
   const calls = await fetchLexingtonCalls();
   console.log("Lexington calls:", calls);
 
-  // TODO: Add your marker update logic here
-  // Example:
-  // clearMarkers();
-  // calls.forEach(call => addMarker(call));
+  // Clear old markers
+  activeMarkers.forEach(m => map.removeLayer(m));
+  activeMarkers = [];
+
+  // Add new markers
+  for (const call of calls) {
+    const latlng = await geocodeAddress(call.address);
+    if (!latlng) continue;
+
+    const icon = call.type === "MED" ? medIcon : fireIcon;
+
+    const marker = L.marker(latlng, { icon }).addTo(map);
+
+    marker.bindPopup(`
+      <strong>${call.type}</strong><br>
+      Incident: ${call.incident}<br>
+      Address: ${call.address}<br>
+      Units: ${call.units}<br>
+      Enroute: ${call.enroute}<br>
+      Arrive: ${call.arrive}
+    `);
+
+    activeMarkers.push(marker);
+  }
 }
 
-// Run immediately on load
-updateMap();
 
-// Refresh every 60 seconds
+// -------------------------------
+//  INITIALIZE
+// -------------------------------
+updateMap();
 setInterval(updateMap, 60000);
