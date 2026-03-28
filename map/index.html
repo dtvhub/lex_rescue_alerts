@@ -11,6 +11,16 @@
     }
   </style>
 </head>
+  <script src="js/lexington.js"></script>
+<script>
+  async function updateMap() {
+    const calls = await fetchLexingtonCalls();
+    console.log("Lexington calls:", calls);
+  }
+
+  updateMap();
+  setInterval(updateMap, 60000); // refresh every minute
+</script>
 <body>
   <div id="map"></div>
 
