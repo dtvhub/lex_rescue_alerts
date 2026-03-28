@@ -1,6 +1,6 @@
 async function fetchLexingtonCalls() {
   // Use AllOrigins to bypass HTTPS → HTTP blocking
-  const url = "https://fire.lexingtonky.gov/open/status/status.htm";
+  const url = "https://api.allorigins.win/raw?url=http://fire.lexingtonky.gov/open/status/status.htm";
 
   try {
     const response = await fetch(url);
