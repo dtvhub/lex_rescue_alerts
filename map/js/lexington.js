@@ -1,27 +1,28 @@
+// Fetch and parse Lexington Fire incidents
 async function fetchLexingtonCalls() {
-  // Use AllOrigins to bypass HTTPS → HTTP blocking
   const url = "https://api.allorigins.win/raw?url=http://fire.lexingtonky.gov/open/status/status.htm";
 
   try {
     const response = await fetch(url);
     const html = await response.text();
 
-    // Parse HTML into a DOM
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    // Select table rows (skip header)
-    const rows = [...doc.querySelectorAll("table tr")].slice(1);
+    // Each incident is inside: <div class="data" grid>
+    const incidentBlocks = [...doc.querySelectorAll("div.data")];
 
-    const calls = rows.map(row => {
-      const cells = row.querySelectorAll("td");
-
+    const calls = incidentBlocks.map(block => {
       return {
-        incident: cells[0]?.innerText.trim() || "",
-        type: cells[1]?.innerText.trim() || "",
-        address: cells[2]?.innerText.trim() || "",
-        units: cells[3]?.innerText.trim() || "",
-        time: cells[4]?.innerText.trim() || ""
+        incident: block.querySelector(".databox.incident")?.innerText.trim() || "",
+        type: block.querySelector(".databox.type")?.innerText.trim() || "",
+        alarm: block.querySelector(".databox.alarm")?.innerText.trim() || "",
+        enroute: block.querySelector(".databox.enroute")?.innerText.trim() || "",
+        arrive: block.querySelector(".databox.arrive")?.innerText.trim() || "",
+        address: block.querySelector(".databox.address")?.innerText.trim() || "",
+        units: [...block.querySelectorAll(".appdata .databox")]
+          .map(u => u.innerText.trim())
+          .join(", ")
       };
     });
 
@@ -32,3 +33,22 @@ async function fetchLexingtonCalls() {
     return [];
   }
 }
+
+// Update the map with markers
+async function updateMap() {
+  console.log("updateMap() called");
+
+  const calls = await fetchLexingtonCalls();
+  console.log("Lexington calls:", calls);
+
+  // TODO: Add your marker update logic here
+  // Example:
+  // clearMarkers();
+  // calls.forEach(call => addMarker(call));
+}
+
+// Run immediately on load
+updateMap();
+
+// Refresh every 60 seconds
+setInterval(updateMap, 60000);
