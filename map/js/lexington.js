@@ -15,8 +15,18 @@ const fireIcon = L.icon({
   popupAnchor: [1, -34]
 });
 
-function getIncidentIcon(type) {
-  return type === "MED" ? medIcon : fireIcon;
+function getIncidentIcon(category) {
+  return category === "EMS" ? medIcon : fireIcon;
+}
+
+// -----------------------------------------------------
+//  CATEGORY DETECTION (based on incident code)
+// -----------------------------------------------------
+function getCategoryFromCode(code) {
+  if (!code) return "UNKNOWN";
+  return code.startsWith("E") ? "EMS" :
+         code.startsWith("F") ? "FIRE" :
+         "EMS"; // default to EMS for numeric codes like 16599
 }
 
 // -----------------------------------------------------
@@ -26,7 +36,7 @@ let CODEBOOK = { ems: [], fire: [] };
 
 async function loadCodebook() {
   try {
-    const res = await fetch("./codes/codes.yml");
+    const res = await fetch("./data/codes.yml");
     const text = await res.text();
     CODEBOOK = jsyaml.load(text);
   } catch (err) {
@@ -34,13 +44,26 @@ async function loadCodebook() {
   }
 }
 
-function translateCode(type, code) {
+function translateCode(category, code) {
   if (!CODEBOOK || !code) return code;
 
-  const list = type === "MED" ? CODEBOOK.ems : CODEBOOK.fire;
+  const list = category === "EMS" ? CODEBOOK.ems : CODEBOOK.fire;
   const found = list.find(entry => entry.code === code);
 
   return found ? found.description : code;
+}
+
+// -----------------------------------------------------
+//  APPARATUS EXTRACTION (handles keys with spaces)
+// -----------------------------------------------------
+function getApparatusList(incident) {
+  return Object.entries(incident)
+    .filter(([key, value]) =>
+      (key.startsWith("aa") || key.startsWith("key")) &&
+      value &&
+      value.trim() !== ""
+    )
+    .map(([key, value]) => `[${value}]`);
 }
 
 // -----------------------------------------------------
@@ -86,20 +109,31 @@ async function loadLexRescueLayer() {
       const geo = await geocodeAddress(cleanedAddress + ", Lexington KY");
       if (!geo) continue;
 
-      // Translate EMS/FIRE code
-      const translated = translateCode(incident.type, incident.incident);
+      // Determine category + translation
+      const code = incident.type;          // MED, FLIFT, 16599, etc.
+      const category = getCategoryFromCode(code);
+      const translated = translateCode(category, code);
+
+      // Apparatus
+      const apparatus = getApparatusList(incident);
+      const apparatusHTML = apparatus.length
+        ? `<br><b>Apparatus:</b> ${apparatus.join(", ")}`
+        : "";
 
       const marker = L.marker([geo.lat, geo.lng], {
-        icon: getIncidentIcon(incident.type)
+        icon: getIncidentIcon(category)
       })
       .addTo(map)
       .bindPopup(`
-        <b>${incident.type}</b><br>
-        Incident: ${translated} (${incident.incident})<br>
+        <b>${category}</b><br>
+        ${code} - ${translated}<br><br>
+
+        Incident: ${incident.incident}<br>
         Alarm: ${incident.alarm}<br>
         Address: ${incident.address}<br>
         Enroute: ${incident.enroute}<br>
         Arrive: ${incident.arrive}
+        ${apparatusHTML}
       `);
 
       lexRescueMarkers.push(marker);
@@ -114,7 +148,7 @@ async function loadLexRescueLayer() {
 //  STARTUP
 // -----------------------------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadCodebook();      // <-- load YAML first
+  await loadCodebook();
   await loadLexRescueLayer();
   setInterval(loadLexRescueLayer, 60000);
 });
