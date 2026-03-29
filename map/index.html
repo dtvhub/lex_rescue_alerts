@@ -13,7 +13,7 @@
         crossorigin=""
     />
 
-    <!-- YAML Parser (required for codes.yml) -->
+    <!-- YAML Parser (needed for codes.yml) -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
     <style>
@@ -25,6 +25,7 @@
             color: #fff;
         }
 
+        /* Header */
         header {
             background: #1C1C1C;
             padding: 15px 20px;
@@ -33,6 +34,7 @@
             color: white;
         }
 
+        /* Footer */
         footer {
             background: #1C1C1C;
             padding: 10px;
@@ -41,9 +43,10 @@
             color: white;
         }
 
+        /* Map container */
         #map {
             width: 100%;
-            height: calc(100vh - 120px);
+            height: calc(100vh - 120px); /* header + footer space */
         }
     </style>
 </head>
@@ -70,9 +73,9 @@
         crossorigin=""
     ></script>
 
-    <!-- Your scripts (order matters!) -->
-    <script src="./js/map.js?v=20260329a"></script>
-    <script src="./js/lexington.js?v=20260329a"></script>
+    <!-- Your map + codebook scripts -->
+    <script src="./js/map.js"></script>
+    <script src="./js/lexington.js"></script>
 
 </body>
 </html>
