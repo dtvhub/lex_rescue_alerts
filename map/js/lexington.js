@@ -1,5 +1,5 @@
 // -----------------------------------------------------
-//  ICONS (Blue for EMS, Red for FIRE)
+//  ICONS
 // -----------------------------------------------------
 const medIcon = L.icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
@@ -20,27 +20,23 @@ function getIncidentIcon(category) {
 }
 
 // -----------------------------------------------------
-//  CATEGORY DETECTION (based on incident code)
+//  CATEGORY DETECTION
 // -----------------------------------------------------
 function getCategoryFromCode(code) {
   if (!code) return "UNKNOWN";
-
   if (code.startsWith("E")) return "EMS";
   if (code.startsWith("F")) return "FIRE";
-
-  // Numeric codes default to EMS (Lexington convention)
-  return "EMS";
+  return "EMS"; // numeric defaults to EMS
 }
 
 // -----------------------------------------------------
-//  LOAD EMS/FIRE CODEBOOK (codes.yml)
+//  LOAD CODEBOOK
 // -----------------------------------------------------
 let CODEBOOK = { ems: [], fire: [] };
 
 async function loadCodebook() {
   try {
-    // FIXED PATH
-    const res = await fetch("./data/codes.yml");
+    const res = await fetch("./data/codes.yml");   // FIXED PATH
     const text = await res.text();
     CODEBOOK = jsyaml.load(text);
   } catch (err) {
@@ -50,15 +46,14 @@ async function loadCodebook() {
 
 function translateCode(category, code) {
   if (!CODEBOOK || !code) return code;
-
   const list = category === "EMS" ? CODEBOOK.ems : CODEBOOK.fire;
+  if (!Array.isArray(list)) return code;
   const found = list.find(entry => entry.code === code);
-
   return found ? found.description : code;
 }
 
 // -----------------------------------------------------
-//  APPARATUS EXTRACTION (handles keys with spaces)
+//  APPARATUS EXTRACTION
 // -----------------------------------------------------
 function getApparatusList(incident) {
   return Object.entries(incident)
@@ -71,7 +66,7 @@ function getApparatusList(incident) {
 }
 
 // -----------------------------------------------------
-//  GEOCODER (no forbidden headers)
+//  GEOCODER
 // -----------------------------------------------------
 async function geocodeAddress(address) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
@@ -93,14 +88,12 @@ async function loadLexRescueLayer() {
     const res = await fetch(url);
     const data = await res.json();
 
-    // Clear old markers
     lexRescueMarkers.forEach(m => map.removeLayer(m));
     lexRescueMarkers = [];
 
     for (const incident of data.incidents) {
       if (!incident.address) continue;
 
-      // Fix block-style addresses
       let cleanedAddress = incident.address;
       const blockMatch = cleanedAddress.match(/(\d+)\s*Blk/i);
 
@@ -113,12 +106,10 @@ async function loadLexRescueLayer() {
       const geo = await geocodeAddress(cleanedAddress + ", Lexington KY");
       if (!geo) continue;
 
-      // Determine category + translation
-      const code = incident.type;          // MED, FLIFT, etc.
+      const code = incident.type;
       const category = getCategoryFromCode(code);
       const translated = translateCode(category, code);
 
-      // Apparatus
       const apparatus = getApparatusList(incident);
       const apparatusHTML = apparatus.length
         ? `<br><b>Apparatus:</b> ${apparatus.join(", ")}`
