@@ -1,5 +1,5 @@
 // -----------------------------------------------------
-//  ICONS (Blue for MED, Red for FIRE)
+//  ICONS (Blue for EMS, Red for FIRE)
 // -----------------------------------------------------
 const medIcon = L.icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
@@ -24,9 +24,12 @@ function getIncidentIcon(category) {
 // -----------------------------------------------------
 function getCategoryFromCode(code) {
   if (!code) return "UNKNOWN";
-  return code.startsWith("E") ? "EMS" :
-         code.startsWith("F") ? "FIRE" :
-         "EMS"; // default to EMS for numeric codes like 16599
+
+  if (code.startsWith("E")) return "EMS";
+  if (code.startsWith("F")) return "FIRE";
+
+  // Numeric codes default to EMS (Lexington convention)
+  return "EMS";
 }
 
 // -----------------------------------------------------
@@ -36,6 +39,7 @@ let CODEBOOK = { ems: [], fire: [] };
 
 async function loadCodebook() {
   try {
+    // FIXED PATH
     const res = await fetch("./data/codes.yml");
     const text = await res.text();
     CODEBOOK = jsyaml.load(text);
@@ -67,11 +71,11 @@ function getApparatusList(incident) {
 }
 
 // -----------------------------------------------------
-//  GEOCODER
+//  GEOCODER (no forbidden headers)
 // -----------------------------------------------------
 async function geocodeAddress(address) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-  const res = await fetch(url, { headers: { "User-Agent": "LexRescueMap" } });
+  const res = await fetch(url);
   const json = await res.json();
   if (json.length === 0) return null;
   return { lat: parseFloat(json[0].lat), lng: parseFloat(json[0].lon) };
@@ -86,7 +90,7 @@ async function loadLexRescueLayer() {
   const url = "https://lexrescuealerts.jeffreydraper.workers.dev/";
 
   try {
-    const res = await fetch(url, { headers: { "User-Agent": "LexRescueMap" } });
+    const res = await fetch(url);
     const data = await res.json();
 
     // Clear old markers
@@ -110,7 +114,7 @@ async function loadLexRescueLayer() {
       if (!geo) continue;
 
       // Determine category + translation
-      const code = incident.type;          // MED, FLIFT, 16599, etc.
+      const code = incident.type;          // MED, FLIFT, etc.
       const category = getCategoryFromCode(code);
       const translated = translateCode(category, code);
 
