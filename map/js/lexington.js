@@ -49,7 +49,10 @@ async function loadLexRescueLayer() {
   const url = "https://lexrescuealerts.jeffreydraper.workers.dev/";
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { "User-Agent": "LexRescueMap" }
+    });
+
     const data = await res.json();
 
     console.log("LexRescue incidents:", data);
