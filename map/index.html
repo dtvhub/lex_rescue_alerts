@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <title>Lexington Rescue Map</title>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
   <style>
     #map {
       height: 100vh;
@@ -13,41 +16,18 @@
 </head>
 
 <body>
+
+  <!-- Map container -->
   <div id="map"></div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <script>
-    // Initialize map
-    const map = L.map('map').setView([38.0464, -84.4970], 12);
+  <!-- Your map creation script -->
+  <script src="js/map.js"></script>
 
-    // Dark basemap (Carto Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CartoDB'
-    }).addTo(map);
-  </script>
-
-  <!-- Lexington call fetcher -->
+  <!-- Your Lexington incident layer -->
   <script src="js/lexington.js"></script>
-
-  <script>
-    console.log("INLINE SCRIPT LOADED");
-
-    async function updateMap() {
-      console.log("updateMap() called");
-
-      try {
-        const calls = await fetchLexingtonCalls();
-        console.log("Lexington calls:", calls);
-      } catch (err) {
-        console.error("updateMap() error:", err);
-      }
-    }
-
-    updateMap();
-    setInterval(updateMap, 60000); // refresh every minute
-  </script>
 
 </body>
 </html>
