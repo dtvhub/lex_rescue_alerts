@@ -12,10 +12,7 @@ async function loadCodebook() {
 function lookupDescription(type, code) {
   if (!CODEBOOK) return code;
 
-  // EMS codes live under CODEBOOK.ems
-  // Fire codes live under CODEBOOK.fire
   const group = type === "MED" ? CODEBOOK.ems : CODEBOOK.fire;
-
   return group?.[code] || code;
 }
 
@@ -70,10 +67,7 @@ async function loadLexRescueLayer() {
     for (const incident of data.incidents) {
       if (!incident.address) continue;
 
-      // -----------------------------------------------------
-      // FIX BLOCK-STYLE ADDRESSES
-      // "INDIAN SUMMER TRL 3500 Blk" → "3500 INDIAN SUMMER TRL"
-      // -----------------------------------------------------
+      // Fix block-style addresses
       let cleanedAddress = incident.address;
       const blockMatch = cleanedAddress.match(/(\d+)\s*Blk/i);
 
@@ -83,11 +77,9 @@ async function loadLexRescueLayer() {
         cleanedAddress = `${blockNum} ${cleanedAddress}`;
       }
 
-      // Geocode the cleaned address
       const geo = await geocodeAddress(cleanedAddress + ", Lexington KY");
       if (!geo) continue;
 
-      // Create marker
       const marker = L.marker([geo.lat, geo.lng], {
         icon: getIncidentIcon(incident.type)
       })
@@ -110,10 +102,10 @@ async function loadLexRescueLayer() {
 }
 
 // -----------------------------------------------------
-//  STARTUP
+//  STARTUP — WAIT FOR DOM + MAP TO EXIST
 // -----------------------------------------------------
-(async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   await loadCodebook();        // Load EMS + Fire codes
   await loadLexRescueLayer();  // Load incidents
   setInterval(loadLexRescueLayer, 60000); // Refresh every 60 seconds
-})();
+});
