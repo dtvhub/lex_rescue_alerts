@@ -1,5 +1,5 @@
 // -----------------------------------------------------
-//  ICONS (Blue for MED, Red for FIRE)
+//  ICONS (Blue for EMS, Red for FIRE)
 // -----------------------------------------------------
 const medIcon = L.icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
@@ -15,8 +15,21 @@ const fireIcon = L.icon({
   popupAnchor: [1, -34]
 });
 
-function getIncidentIcon(type) {
-  return type === "MED" ? medIcon : fireIcon;
+function getIncidentIcon(category) {
+  return category === "EMS" ? medIcon : fireIcon;
+}
+
+// -----------------------------------------------------
+//  CATEGORY DETECTION (based on incident code)
+// -----------------------------------------------------
+function getCategoryFromCode(code) {
+  if (!code) return "UNKNOWN";
+
+  if (code.startsWith("E")) return "EMS";
+  if (code.startsWith("F")) return "FIRE";
+
+  // Numeric codes default to EMS (Lexington convention)
+  return "EMS";
 }
 
 // -----------------------------------------------------
@@ -26,7 +39,8 @@ let CODEBOOK = { ems: [], fire: [] };
 
 async function loadCodebook() {
   try {
-    const res = await fetch("./codes/codes.yml");
+    // FIXED PATH
+    const res = await fetch("./data/codes.yml");
     const text = await res.text();
     CODEBOOK = jsyaml.load(text);
   } catch (err) {
@@ -34,21 +48,34 @@ async function loadCodebook() {
   }
 }
 
-function translateCode(type, code) {
+function translateCode(category, code) {
   if (!CODEBOOK || !code) return code;
 
-  const list = type === "MED" ? CODEBOOK.ems : CODEBOOK.fire;
+  const list = category === "EMS" ? CODEBOOK.ems : CODEBOOK.fire;
   const found = list.find(entry => entry.code === code);
 
   return found ? found.description : code;
 }
 
 // -----------------------------------------------------
-//  GEOCODER
+//  APPARATUS EXTRACTION (handles keys with spaces)
+// -----------------------------------------------------
+function getApparatusList(incident) {
+  return Object.entries(incident)
+    .filter(([key, value]) =>
+      (key.startsWith("aa") || key.startsWith("key")) &&
+      value &&
+      value.trim() !== ""
+    )
+    .map(([key, value]) => `[${value}]`);
+}
+
+// -----------------------------------------------------
+//  GEOCODER (no forbidden headers)
 // -----------------------------------------------------
 async function geocodeAddress(address) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-  const res = await fetch(url, { headers: { "User-Agent": "LexRescueMap" } });
+  const res = await fetch(url);
   const json = await res.json();
   if (json.length === 0) return null;
   return { lat: parseFloat(json[0].lat), lng: parseFloat(json[0].lon) };
@@ -63,7 +90,7 @@ async function loadLexRescueLayer() {
   const url = "https://lexrescuealerts.jeffreydraper.workers.dev/";
 
   try {
-    const res = await fetch(url, { headers: { "User-Agent": "LexRescueMap" } });
+    const res = await fetch(url);
     const data = await res.json();
 
     // Clear old markers
@@ -86,20 +113,31 @@ async function loadLexRescueLayer() {
       const geo = await geocodeAddress(cleanedAddress + ", Lexington KY");
       if (!geo) continue;
 
-      // Translate EMS/FIRE code
-      const translated = translateCode(incident.type, incident.incident);
+      // Determine category + translation
+      const code = incident.type;          // MED, FLIFT, etc.
+      const category = getCategoryFromCode(code);
+      const translated = translateCode(category, code);
+
+      // Apparatus
+      const apparatus = getApparatusList(incident);
+      const apparatusHTML = apparatus.length
+        ? `<br><b>Apparatus:</b> ${apparatus.join(", ")}`
+        : "";
 
       const marker = L.marker([geo.lat, geo.lng], {
-        icon: getIncidentIcon(incident.type)
+        icon: getIncidentIcon(category)
       })
       .addTo(map)
       .bindPopup(`
-        <b>${incident.type}</b><br>
-        Incident: ${translated} (${incident.incident})<br>
+        <b>${category}</b><br>
+        ${code} - ${translated}<br><br>
+
+        Incident: ${incident.incident}<br>
         Alarm: ${incident.alarm}<br>
         Address: ${incident.address}<br>
         Enroute: ${incident.enroute}<br>
         Arrive: ${incident.arrive}
+        ${apparatusHTML}
       `);
 
       lexRescueMarkers.push(marker);
@@ -114,7 +152,7 @@ async function loadLexRescueLayer() {
 //  STARTUP
 // -----------------------------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadCodebook();      // <-- load YAML first
+  await loadCodebook();
   await loadLexRescueLayer();
   setInterval(loadLexRescueLayer, 60000);
 });
