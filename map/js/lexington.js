@@ -1,6 +1,6 @@
-// -----------------------------
+// -----------------------------------------------------
 //  ICONS (Blue for MED, Red for FIRE)
-// -----------------------------
+// -----------------------------------------------------
 const medIcon = L.icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
   iconSize: [25, 41],
@@ -21,9 +21,9 @@ function getIncidentIcon(type) {
   return type.toUpperCase() === "MED" ? medIcon : fireIcon;
 }
 
-// -----------------------------
+// -----------------------------------------------------
 //  GEOCODER (Nominatim)
-// -----------------------------
+// -----------------------------------------------------
 async function geocodeAddress(address) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
 
@@ -40,9 +40,11 @@ async function geocodeAddress(address) {
   };
 }
 
-// -----------------------------
+// -----------------------------------------------------
 //  MAIN LAYER LOADER
-// -----------------------------
+// -----------------------------------------------------
+let lexRescueMarkers = []; // store markers so we can clear them
+
 async function loadLexRescueLayer() {
   const url = "https://lexrescuealerts.jeffreydraper.workers.dev/";
 
@@ -52,6 +54,10 @@ async function loadLexRescueLayer() {
 
     console.log("LexRescue incidents:", data);
 
+    // Clear old markers
+    lexRescueMarkers.forEach(m => map.removeLayer(m));
+    lexRescueMarkers = [];
+
     for (const incident of data.incidents) {
       if (!incident.address) continue;
 
@@ -59,8 +65,8 @@ async function loadLexRescueLayer() {
       const geo = await geocodeAddress(incident.address + ", Lexington KY");
       if (!geo) continue;
 
-      // Add marker to map
-      L.marker([geo.lat, geo.lng], {
+      // Create marker
+      const marker = L.marker([geo.lat, geo.lng], {
         icon: getIncidentIcon(incident.type)
       })
       .addTo(map)
@@ -72,6 +78,8 @@ async function loadLexRescueLayer() {
         Enroute: ${incident.enroute}<br>
         Arrive: ${incident.arrive}
       `);
+
+      lexRescueMarkers.push(marker);
     }
 
   } catch (err) {
@@ -79,8 +87,8 @@ async function loadLexRescueLayer() {
   }
 }
 
-// -----------------------------
+// -----------------------------------------------------
 //  AUTO-REFRESH
-// -----------------------------
+// -----------------------------------------------------
 loadLexRescueLayer();
 setInterval(loadLexRescueLayer, 60000); // refresh every 60 seconds
