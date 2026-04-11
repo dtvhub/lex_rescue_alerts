@@ -4,13 +4,40 @@
 
 // Custom camera icon
 const cameraIcon = L.icon({
-  iconUrl: 'https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/camera.png?raw=true',   // relative to /map/js/
-  iconSize: [28, 28],      // display size on map
-  iconAnchor: [14, 28],    // point of the icon that touches the map
-  popupAnchor: [0, -28]    // popup position relative to icon
+  iconUrl: 'https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/camera.png?raw=true',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28]
 });
 
-// Create the cameras layer
+// -----------------------------------------------------
+//  CAMERA GEOJSON LAYER (with Raven Run added)
+// -----------------------------------------------------
+
+const cameraLayer = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Raven Run Nature Sanctuary",
+        "category": "camera",
+        "url": "https://github.com/dtvhub/beacon/blob/main/ro/redirect/Raven_Run.html?raw=true"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-84.4097, 37.8993]
+      }
+    }
+
+    // Add more cameras here as needed
+  ]
+};
+
+// -----------------------------------------------------
+//  CREATE CAMERA LAYER
+// -----------------------------------------------------
+
 const cameras = L.geoJSON(cameraLayer, {
   pointToLayer: (feature, latlng) => {
     return L.marker(latlng, { icon: cameraIcon });
