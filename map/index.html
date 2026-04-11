@@ -138,8 +138,7 @@
 
     <!-- POPUP MENU -->
     <div id="layerMenu" class="menu-popup">
-      <label><input type="checkbox" id="fireLayerToggle" checked> Fire</label>
-      <label><input type="checkbox" id="emsLayerToggle" checked> EMS</label>
+      <label><input type="checkbox" id="lexingtonLayerToggle" checked> Lexington Fire & EMS</label>
       <label><input type="checkbox" id="cameraLayerToggle" checked> Cameras</label>
     </div>
   </footer>
@@ -181,15 +180,9 @@
     });
 
     // Layer toggles
-    document.getElementById('fireLayerToggle').addEventListener('change', e => {
-      if (typeof fireLayer !== 'undefined') {
-        e.target.checked ? fireLayer.addTo(map) : map.removeLayer(fireLayer);
-      }
-    });
-
-    document.getElementById('emsLayerToggle').addEventListener('change', e => {
-      if (typeof emsLayer !== 'undefined') {
-        e.target.checked ? emsLayer.addTo(map) : map.removeLayer(emsLayer);
+    document.getElementById('lexingtonLayerToggle').addEventListener('change', e => {
+      if (typeof lexingtonLayer !== 'undefined') {
+        e.target.checked ? lexingtonLayer.addTo(map) : map.removeLayer(lexingtonLayer);
       }
     });
 
