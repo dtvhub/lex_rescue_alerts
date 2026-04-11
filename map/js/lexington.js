@@ -15,8 +15,9 @@ const fireIcon = L.icon({
   popupAnchor: [0, -28]
 });
 
+// FIXED: use emsIcon, not medIcon
 function getIncidentIcon(category) {
-  return category === "EMS" ? medIcon : fireIcon;
+  return category === "EMS" ? emsIcon : fireIcon;
 }
 
 // -----------------------------------------------------
@@ -36,7 +37,7 @@ let CODEBOOK = { ems: [], fire: [] };
 
 async function loadCodebook() {
   try {
-    const res = await fetch("./data/codes.yml");   // CORRECT PATH
+    const res = await fetch("./data/codes.yml");
     const text = await res.text();
     CODEBOOK = jsyaml.load(text);
   } catch (err) {
@@ -49,9 +50,6 @@ function translateCode(category, code) {
   const list = category === "EMS" ? CODEBOOK.ems : CODEBOOK.fire;
   if (!Array.isArray(list)) return code;
   const found = list.find(entry => entry.code === code);
-
-  console.log("Translated:", code, "→", found ? found.description : code);
-
   return found ? found.description : code;
 }
 
@@ -62,8 +60,7 @@ function getApparatusList(incident) {
   return Object.entries(incident)
     .filter(([key, value]) =>
       (key.startsWith("aa") || key.startsWith("key")) &&
-      value &&
-      value.trim() !== ""
+      value && value.trim() !== ""
     )
     .map(([key, value]) => `[${value}]`);
 }
