@@ -7,10 +7,7 @@
 
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
     body, html {
@@ -27,18 +24,22 @@
       to { opacity: 1; }
     }
 
+    /* FIXED: map now fills everything above footer */
     #map {
-      height: calc(100% - 42px);
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
+      bottom: 60px; /* footer height */
     }
 
-    /* Footer */
+    /* Taller footer */
     footer {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 42px;
+      height: 60px;
       background: rgba(0, 0, 0, 0.55);
       color: white;
       display: flex;
@@ -48,14 +49,15 @@
       z-index: 9999;
     }
 
-    /* Menu icon positioned left + vertically centered */
+    /* Centered menu icon */
     #menu-icon {
       position: absolute;
-      left: 16px;
+      left: 50%;
+      transform: translateX(-50%);
       top: 50%;
-      transform: translateY(-50%);
-      width: 26px;
-      height: 26px;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
       cursor: pointer;
       opacity: 0.85;
     }
@@ -64,38 +66,39 @@
       opacity: 1;
     }
 
-    /* Popup menu */
+    /* Centered popup menu */
     #menu-popup {
       position: fixed;
-      bottom: 50px;
-      left: 10px;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.85);
-      padding: 12px;
+      padding: 14px 18px;
       border-radius: 8px;
       color: white;
       display: none;
       z-index: 99999;
       animation: fadeIn 0.2s ease-in-out;
+      font-size: 15px;
     }
 
     #menu-popup label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       cursor: pointer;
     }
   </style>
 </head>
 
 <body>
+
   <div id="map"></div>
 
-  <!-- Footer -->
   <footer>
     <img id="menu-icon" src="menu.png" alt="Menu" />
     powered by DTVHub | © 2026
   </footer>
 
-  <!-- Popup menu -->
   <div id="menu-popup">
     <label><input type="checkbox" id="fireToggle" checked> Fire</label>
     <label><input type="checkbox" id="emsToggle" checked> EMS</label>
@@ -104,6 +107,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
   <script src="map.js"></script>
   <script src="lexington.js"></script>
 
@@ -111,7 +115,8 @@
     const menuIcon = document.getElementById("menu-icon");
     const menuPopup = document.getElementById("menu-popup");
 
-    menuIcon.addEventListener("click", () => {
+    menuIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
       menuPopup.style.display =
         menuPopup.style.display === "block" ? "none" : "block";
     });
@@ -122,5 +127,6 @@
       }
     });
   </script>
+
 </body>
 </html>
