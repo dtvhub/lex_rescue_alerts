@@ -27,12 +27,12 @@ function getIncidentIcon(category) {
 }
 
 // -----------------------------------------------------
-//  FETCH LEXINGTON INCIDENTS
+//  FETCH LEXINGTON INCIDENTS FROM YOUR WORKER
 // -----------------------------------------------------
 
 async function loadLexingtonIncidents() {
   try {
-    const response = await fetch("https://lexingtonky.gov/sites/default/files/incident_data.json");
+    const response = await fetch("https://lexrescuealerts.jeffreydraper.workers.dev/");
     const data = await response.json();
 
     // Clear old markers
@@ -75,7 +75,7 @@ async function loadLexingtonIncidents() {
       }
     });
 
-    // Add both layers to map (toggles will hide/show)
+    // Add both layers to map
     fireLayer.addTo(map);
     emsLayer.addTo(map);
 
