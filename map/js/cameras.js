@@ -22,7 +22,7 @@ const cameraLayer = {
       "properties": {
         "name": "Raven Run Nature Sanctuary",
         "category": "camera",
-        "url": "https://github.com/dtvhub/beacon/blob/main/ro/redirect/Raven_Run.html?raw=true"
+        "url": "https://dtvhub.github.io/beacon/ro/redirect/Raven_Run.html"
       },
       "geometry": {
         "type": "Point",
