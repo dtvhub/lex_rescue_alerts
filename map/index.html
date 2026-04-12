@@ -5,125 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Beacon | Rescue Map</title>
 
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png"
+        href="https://github.com/dtvhub/beacon/blob/main/map/assets/images/beaconLH4.PNG?raw=true">
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+
+  <!-- YAML Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
   <style>
-    body, html {
+    body {
       margin: 0;
       padding: 0;
-      height: 100%;
       background: #000;
-      overflow: hidden;
-      animation: fadeIn 0.6s ease-in-out;
+      font-family: Arial, sans-serif;
+      color: #fff;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* FIXED: map now fills everything above footer */
-    #map {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      bottom: 60px; /* footer height */
-    }
-
-    /* Taller footer */
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.55);
+    header {
+      background: #1C1C1C;
+      padding: 18px 22px;
+      font-size: 24px;
+      font-weight: bold;
       color: white;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      z-index: 9999;
+      gap: 10px;
+      border-bottom: 1px solid #333;
     }
 
-    /* Centered menu icon */
-    #menu-icon {
+    header img {
+      width: 60px;
+      height: auto;
+      opacity: 0.9;
+    }
+
+    /* TALLER FOOTER */
+    footer {
+      position: relative;
+      background: rgba(28, 28, 28, 0.92);
+      padding: 26px 10px 40px 10px; /* increased height */
+      text-align: center;
+      font-size: 12px;
+      color: white;
+      border-top: 1px solid #333;
+    }
+
+    #map {
+      width: 100%;
+      height: calc(100vh - 150px); /* adjusted for taller footer */
+    }
+
+    /* MENU ICON INSIDE FOOTER */
+    .menu-icon {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 30px;
-      height: 30px;
+      bottom: 10px;
+      left: 10px;
+      width: 34px;
+      height: 34px;
       cursor: pointer;
-      opacity: 0.85;
+      opacity: 0.9;
+      transition: opacity 0.2s ease;
+      z-index: 1001;
     }
 
-    #menu-icon:hover {
+    .menu-icon:hover {
       opacity: 1;
     }
 
-    /* Centered popup menu */
-    #menu-popup {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
-      padding: 14px 18px;
-      border-radius: 8px;
+    /* POPUP MENU */
+    .menu-popup {
+      position: absolute;
+      bottom: 95px; /* lifted to match taller footer */
+      left: 10px;
+      background-color: rgba(28, 28, 28, 0.95);
       color: white;
-      display: none;
-      z-index: 99999;
-      animation: fadeIn 0.2s ease-in-out;
-      font-size: 15px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 1002;
+      text-align: left;
+      font-size: 14px;
     }
 
-    #menu-popup label {
+    .menu-popup.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .menu-popup label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       cursor: pointer;
+    }
+
+    .menu-popup input[type="checkbox"] {
+      margin-right: 6px;
     }
   </style>
 </head>
 
 <body>
 
+  <header>
+    <img src="https://github.com/dtvhub/beacon/blob/main/map/assets/images/beaconLH4.PNG?raw=true" alt="Beacon logo">
+    Beacon | Rescue Map
+  </header>
+
   <div id="map"></div>
 
   <footer>
-    <img id="menu-icon" src="menu.png" alt="Menu" />
     powered by DTVHub | © 2026
+
+    <img id="menuButton"
+         src="https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/menu%20.png?raw=true"
+         alt="Menu"
+         class="menu-icon">
+
+    <div id="layerMenu" class="menu-popup">
+      <label><input type="checkbox" id="fireLayerToggle" checked> Fire</label>
+      <label><input type="checkbox" id="emsLayerToggle" checked> EMS</label>
+      <label><input type="checkbox" id="cameraLayerToggle" checked> Cameras</label>
+    </div>
   </footer>
 
-  <div id="menu-popup">
-    <label><input type="checkbox" id="fireToggle" checked> Fire</label>
-    <label><input type="checkbox" id="emsToggle" checked> EMS</label>
-    <label><input type="checkbox" id="cameraToggle" checked> Cameras</label>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-
-  <script src="map.js"></script>
-  <script src="lexington.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
   <script>
-    const menuIcon = document.getElementById("menu-icon");
-    const menuPopup = document.getElementById("menu-popup");
+    const v = Date.now();
+    document.write(`<script src="./js/map.js?v=${v}"><\/script>`);
+    document.write(`<script src="./js/lexington.js?v=${v}"><\/script>`);
+    document.write(`<script src="./js/cameras.js?v=${v}"><\/script>`);
+  </script>
 
-    menuIcon.addEventListener("click", (e) => {
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const layerMenu = document.getElementById('layerMenu');
+
+    menuButton.addEventListener('click', (e) => {
       e.stopPropagation();
-      menuPopup.style.display =
-        menuPopup.style.display === "block" ? "none" : "block";
+      layerMenu.classList.toggle('show');
     });
 
-    document.addEventListener("click", (e) => {
-      if (!menuPopup.contains(e.target) && e.target !== menuIcon) {
-        menuPopup.style.display = "none";
+    document.addEventListener('click', () => {
+      layerMenu.classList.remove('show');
+    });
+
+    layerMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    document.getElementById('fireLayerToggle').addEventListener('change', e => {
+      if (typeof fireLayer !== 'undefined') {
+        e.target.checked ? fireLayer.addTo(map) : map.removeLayer(fireLayer);
+      }
+    });
+
+    document.getElementById('emsLayerToggle').addEventListener('change', e => {
+      if (typeof emsLayer !== 'undefined') {
+        e.target.checked ? emsLayer.addTo(map) : map.removeLayer(emsLayer);
+      }
+    });
+
+    document.getElementById('cameraLayerToggle').addEventListener('change', e => {
+      if (typeof cameras !== 'undefined') {
+        e.target.checked ? cameras.addTo(map) : map.removeLayer(cameras);
       }
     });
   </script>
