@@ -26,6 +26,7 @@
       background: #000;
       font-family: Arial, sans-serif;
       color: #fff;
+      overflow: hidden; /* Prevent scrolling */
     }
 
     header {
@@ -38,6 +39,8 @@
       align-items: center;
       gap: 10px;
       border-bottom: 1px solid #333;
+      height: 60px;
+      box-sizing: border-box;
     }
 
     header img {
@@ -46,35 +49,38 @@
       opacity: 0.9;
     }
 
-    /* TALLER FOOTER */
+    /* FIXED FOOTER HEIGHT */
     footer {
       position: relative;
       background: rgba(28, 28, 28, 0.92);
-      padding: 8px 10px 12px 10px;
+      padding: 10px 10px;
       text-align: center;
       font-size: 12px;
       color: white;
       border-top: 1px solid #333;
+      height: 48px;
+      box-sizing: border-box;
     }
 
+    /* MAP FITS SCREEN EXACTLY */
     #map {
       width: 100%;
-   height: calc(100vh - 80px);
+      height: calc(100vh - 108px); /* 60px header + 48px footer */
     }
 
- /* MENU ICON INSIDE FOOTER — CENTERED */
-.menu-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  cursor: pointer;
-  opacity: 0.9;
-  transition: opacity 0.2s ease;
-  z-index: 1001;
-}
+    /* MENU ICON — PERFECTLY CENTERED */
+    .menu-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.2s ease;
+      z-index: 1001;
+    }
 
     .menu-icon:hover {
       opacity: 1;
@@ -83,7 +89,7 @@
     /* POPUP MENU */
     .menu-popup {
       position: absolute;
-      bottom: 95px; /* lifted to match taller footer */
+      bottom: 58px; /* 48px footer + 10px spacing */
       left: 10px;
       background-color: rgba(28, 28, 28, 0.95);
       color: white;
@@ -147,44 +153,4 @@
     const v = Date.now();
     document.write(`<script src="./js/map.js?v=${v}"><\/script>`);
     document.write(`<script src="./js/lexington.js?v=${v}"><\/script>`);
-    document.write(`<script src="./js/cameras.js?v=${v}"><\/script>`);
-  </script>
-
-  <script>
-    const menuButton = document.getElementById('menuButton');
-    const layerMenu = document.getElementById('layerMenu');
-
-    menuButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      layerMenu.classList.toggle('show');
-    });
-
-    document.addEventListener('click', () => {
-      layerMenu.classList.remove('show');
-    });
-
-    layerMenu.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    document.getElementById('fireLayerToggle').addEventListener('change', e => {
-      if (typeof fireLayer !== 'undefined') {
-        e.target.checked ? fireLayer.addTo(map) : map.removeLayer(fireLayer);
-      }
-    });
-
-    document.getElementById('emsLayerToggle').addEventListener('change', e => {
-      if (typeof emsLayer !== 'undefined') {
-        e.target.checked ? emsLayer.addTo(map) : map.removeLayer(emsLayer);
-      }
-    });
-
-    document.getElementById('cameraLayerToggle').addEventListener('change', e => {
-      if (typeof cameras !== 'undefined') {
-        e.target.checked ? cameras.addTo(map) : map.removeLayer(cameras);
-      }
-    });
-  </script>
-
-</body>
-</html>
+    document.write(`
