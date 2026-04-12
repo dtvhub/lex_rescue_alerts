@@ -38,6 +38,26 @@ let CODEBOOK = {};
 //  ADDRESS NORMALIZATION HELPERS
 // -----------------------------------------------------
 
+// Expand abbreviations for better geocoding
+function expandStreetAbbreviations(str) {
+  if (!str) return str;
+
+  return str
+    .replace(/\bN\b/gi, "North")
+    .replace(/\bS\b/gi, "South")
+    .replace(/\bE\b/gi, "East")
+    .replace(/\bW\b/gi, "West")
+    .replace(/\bST\b/gi, "Street")
+    .replace(/\bRD\b/gi, "Road")
+    .replace(/\bAVE\b/gi, "Avenue")
+    .replace(/\bBLVD\b/gi, "Boulevard")
+    .replace(/\bDR\b/gi, "Drive")
+    .replace(/\bPL\b/gi, "Place")
+    .replace(/\bCT\b/gi, "Court")
+    .replace(/\bLN\b/gi, "Lane")
+    .replace(/\bCIR\b/gi, "Circle");
+}
+
 // "MASTERSON STATION DR 300 Blk" → "300 MASTERSON STATION DR"
 function fixBlockAddress(address) {
   if (!address) return address;
@@ -52,7 +72,7 @@ function fixBlockAddress(address) {
   return address;
 }
 
-// "W MAIN ST & JEFFERSON ST" → "W MAIN ST & JEFFERSON ST" (kept same, geocoder handles it)
+// "W MAIN ST & JEFFERSON ST" → "W MAIN ST & JEFFERSON ST"
 function fixIntersectionAddress(address) {
   if (!address) return address;
 
@@ -69,8 +89,11 @@ function fixIntersectionAddress(address) {
 // Full normalization pipeline
 function normalizeAddress(raw) {
   if (!raw) return raw;
+
   let fixed = fixBlockAddress(raw);
   fixed = fixIntersectionAddress(fixed);
+  fixed = expandStreetAbbreviations(fixed);
+
   return fixed;
 }
 
