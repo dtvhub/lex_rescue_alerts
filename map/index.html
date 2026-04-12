@@ -26,7 +26,7 @@
       background: #000;
       font-family: Arial, sans-serif;
       color: #fff;
-      overflow: hidden; /* Prevent scrolling */
+      overflow: hidden;
     }
 
     /* GLASS HEADER */
@@ -44,6 +44,8 @@
       border-bottom: 1px solid rgba(255,255,255,0.08);
       height: 60px;
       box-sizing: border-box;
+      z-index: 9999;
+      position: relative;
     }
 
     header img {
@@ -65,15 +67,17 @@
       border-top: 1px solid rgba(255,255,255,0.08);
       height: 48px;
       box-sizing: border-box;
+      z-index: 9999;
     }
 
     /* MAP FITS SCREEN EXACTLY */
     #map {
       width: 100%;
-      height: calc(100vh - 108px); /* 60px header + 48px footer */
+      height: calc(100vh - 108px); /* 60 header + 48 footer */
+      z-index: 1;
     }
 
-    /* MENU ICON — CENTERED GLASS UI */
+    /* MENU ICON — CENTERED */
     .menu-icon {
       position: absolute;
       left: 10px;
@@ -84,7 +88,7 @@
       cursor: pointer;
       opacity: 0.9;
       transition: opacity 0.2s ease;
-      z-index: 1001;
+      z-index: 10000;
     }
 
     .menu-icon:hover {
@@ -94,7 +98,7 @@
     /* GLASS POPUP MENU */
     .menu-popup {
       position: absolute;
-      bottom: 58px; /* 48px footer + 10px spacing */
+      bottom: 58px;
       left: 10px;
       background: rgba(20, 20, 20, 0.55);
       backdrop-filter: blur(12px);
@@ -107,7 +111,7 @@
       pointer-events: none;
       transform: translateY(10px);
       transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 1002;
+      z-index: 100000; /* Ensures popup is above map + footer */
       text-align: left;
       font-size: 14px;
     }
