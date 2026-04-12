@@ -38,7 +38,6 @@ let CODEBOOK = {};
 //  ADDRESS NORMALIZATION HELPERS
 // -----------------------------------------------------
 
-// Decode HTML entities from Worker output
 function decodeHtmlEntities(str) {
   if (!str) return str;
   return str
@@ -50,7 +49,6 @@ function decodeHtmlEntities(str) {
     .replace(/&gt;/gi, ">");
 }
 
-// Expand abbreviations for better geocoding
 function expandStreetAbbreviations(str) {
   if (!str) return str;
 
@@ -70,7 +68,6 @@ function expandStreetAbbreviations(str) {
     .replace(/\bCIR\b/gi, "Circle");
 }
 
-// "MASTERSON STATION DR 300 Blk" → "300 MASTERSON STATION DR"
 function fixBlockAddress(address) {
   if (!address) return address;
 
@@ -84,7 +81,6 @@ function fixBlockAddress(address) {
   return address;
 }
 
-// "W MAIN ST & JEFFERSON ST"
 function fixIntersectionAddress(address) {
   if (!address) return address;
 
@@ -98,7 +94,6 @@ function fixIntersectionAddress(address) {
   return address;
 }
 
-// Full normalization pipeline
 function normalizeAddress(raw) {
   if (!raw) return raw;
 
@@ -123,18 +118,12 @@ async function geocodeAddress(address) {
 
   let url;
 
-  // Intersection detection
+  // Intersection → use q= search (reliable)
   if (address.includes("&")) {
-    const parts = address.split("&").map(p => p.trim());
-    if (parts.length === 2) {
-      url =
-        `https://nominatim.openstreetmap.org/search?format=json` +
-        `&street=${encodeURIComponent(parts[0] + " & " + parts[1])}` +
-        `&city=Lexington&state=KY`;
-    }
+    url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ", Lexington KY")}`;
   }
 
-  // Fallback for normal addresses
+  // Normal address fallback
   if (!url) {
     url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ", Lexington KY")}`;
   }
@@ -145,7 +134,10 @@ async function geocodeAddress(address) {
     });
     const json = await res.json();
 
-    if (!json.length) return null;
+    if (!json.length) {
+      console.warn("No geocode result:", address);
+      return null;
+    }
 
     const geo = {
       lat: parseFloat(json[0].lat),
@@ -156,7 +148,7 @@ async function geocodeAddress(address) {
     return geo;
 
   } catch (err) {
-    console.error("Geocoding failed:", err);
+    console.error("Geocoding failed:", address, err);
     return null;
   }
 }
