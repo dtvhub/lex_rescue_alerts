@@ -111,7 +111,7 @@
       pointer-events: none;
       transform: translateY(10px);
       transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 100000; /* Ensures popup is above map + footer */
+      z-index: 100000;
       text-align: left;
       font-size: 14px;
     }
@@ -122,14 +122,25 @@
       transform: translateY(0);
     }
 
-    .menu-popup label {
-      display: block;
-      margin-bottom: 6px;
+    /* ICON LEGEND ITEMS */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
       cursor: pointer;
     }
 
-    .menu-popup input[type="checkbox"] {
-      margin-right: 6px;
+    .menu-item img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      opacity: 0.9;
+    }
+
+    .menu-item input[type="checkbox"] {
+      margin-left: auto;
+      transform: scale(1.2);
     }
   </style>
 </head>
@@ -151,10 +162,27 @@
          alt="Menu"
          class="menu-icon">
 
+    <!-- UPDATED POPUP MENU WITH ICONS -->
     <div id="layerMenu" class="menu-popup">
-      <label><input type="checkbox" id="fireLayerToggle" checked> Fire</label>
-      <label><input type="checkbox" id="emsLayerToggle" checked> EMS</label>
-      <label><input type="checkbox" id="cameraLayerToggle" checked> Cameras</label>
+
+      <label class="menu-item">
+        <img src="https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/fire.png?raw=true">
+        Fire
+        <input type="checkbox" id="fireLayerToggle" checked>
+      </label>
+
+      <label class="menu-item">
+        <img src="https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/ems.png?raw=true">
+        EMS
+        <input type="checkbox" id="emsLayerToggle" checked>
+      </label>
+
+      <label class="menu-item">
+        <img src="https://github.com/dtvhub/beacon/blob/main/map/assets/images/icons/camera.png?raw=true">
+        Cameras
+        <input type="checkbox" id="cameraLayerToggle" checked>
+      </label>
+
     </div>
   </footer>
 
