@@ -28,12 +28,29 @@ let CODEBOOK = {};
   try {
     const res = await fetch("./js/codebook.js");
     const text = await res.text();
-    // Evaluate the JS file to load CODEBOOK
-    eval(text);
+    eval(text); // loads CODEBOOK
   } catch (err) {
     console.error("Failed to load codebook.js", err);
   }
 })();
+
+// -----------------------------------------------------
+//  BLOCK ADDRESS FIXER
+//  "MASTERSON STATION DR 300 Blk" → "300 MASTERSON STATION DR"
+// -----------------------------------------------------
+
+function fixBlockAddress(address) {
+  if (!address) return address;
+
+  const blkMatch = address.match(/(.+?)\s+(\d+)\s*Blk/i);
+  if (blkMatch) {
+    const street = blkMatch[1].trim();
+    const number = blkMatch[2].trim();
+    return `${number} ${street}`;
+  }
+
+  return address;
+}
 
 // -----------------------------------------------------
 //  CLIENT-SIDE GEOCODING (with caching)
@@ -108,15 +125,18 @@ async function loadLexingtonIncidents() {
       const type = incident.type || "";
       const translated = translateType(type);
       const category = detectCategory(type);
-      const address = incident.address || "";
 
-      const geo = await geocodeAddress(address);
+      const rawAddress = incident.address || "";
+      const fixedAddress = fixBlockAddress(rawAddress);
+
+      const geo = await geocodeAddress(fixedAddress);
       if (!geo) continue;
 
       const marker = L.marker([geo.lat, geo.lng], {
         icon: getIconForCategory(category)
       });
 
+      // Apparatus extraction (aa1, aa2, aa3…)
       const apparatusHTML = Object.keys(incident)
         .filter(k => k.startsWith("aa"))
         .map(k => incident[k])
@@ -126,29 +146,4 @@ async function loadLexingtonIncidents() {
         <b>${category}</b><br>
         ${type} - ${translated}<br><br>
 
-        Incident: ${incident.incident || ""}<br>
-        Alarm: ${incident.alarm || ""}<br>
-        Address: ${address}<br>
-        Enroute: ${incident.enroute || ""}<br>
-        Arrive: ${incident.arrive || ""}<br><br>
-
-        ${apparatusHTML ? `<strong>Units:</strong><br>${apparatusHTML}` : ""}
-      `);
-
-      if (category === "FIRE") {
-        fireLayer.addLayer(marker);
-      } else {
-        emsLayer.addLayer(marker);
-      }
-    }
-
-    fireLayer.addTo(map);
-    emsLayer.addTo(map);
-
-  } catch (err) {
-    console.error("Lexington incident load failed:", err);
-  }
-}
-
-loadLexingtonIncidents();
-setInterval(loadLexingtonIncidents, 60000);
+       
