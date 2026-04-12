@@ -59,21 +59,22 @@
 
     #map {
       width: 100%;
-      height: calc(100vh - 150px); /* adjusted for taller footer */
+   height: calc(100vh - 80px);
     }
 
-    /* MENU ICON INSIDE FOOTER */
-    .menu-icon {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      width: 34px;
-      height: 34px;
-      cursor: pointer;
-      opacity: 0.9;
-      transition: opacity 0.2s ease;
-      z-index: 1001;
-    }
+ /* MENU ICON INSIDE FOOTER — CENTERED */
+.menu-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+  z-index: 1001;
+}
 
     .menu-icon:hover {
       opacity: 1;
